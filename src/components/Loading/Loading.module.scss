@@ -1,0 +1,18 @@
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.LoadingWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: calc(100vh - 70px);
+}
+
+.AnimatedIcon {
+  animation: spin 2s linear infinite;
+}

@@ -3,10 +3,25 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { createStore } from "redux";
+import { Provider } from 'react-redux';
+
+const menuReducer = (state=false, action) => {
+  switch (action.type) {
+    case "toggle":
+      return !state;
+    default:
+      return state;
+  }
+}
+
+let store = createStore(menuReducer);
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

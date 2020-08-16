@@ -1,0 +1,86 @@
+.OpinionWrapper {
+  display: flex;
+  flex-direction: column;
+
+  &.Expanded {
+    .SectionHeader {
+      .SectionStateIcon {
+        transform: rotate(180deg);
+      }
+    }
+  }
+
+  .SectionHeader {
+    display: flex;
+    align-items: center;
+
+    .SectionName {
+      height: 100%;
+      width: calc(100% - 24px);
+    }
+
+    .SectionStateIcon {
+      width: 24px;
+      transition: 200ms ease-in-out;
+    }
+  }
+
+  .SectionContent {
+    overflow: hidden;
+  }
+}
+
+.OpinionsList {
+  display: flex;
+  flex-direction: column;
+
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.RatingWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 0 12px;
+}
+
+.AddOpinion {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+
+  input, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 4px 0;
+    border-radius: 2px;
+    border: none;
+    box-sizing: border-box;
+    border-bottom: 2px solid #117243;
+    font-family: Roboto;
+    font-size: 1em;
+    outline: none;
+    transition-duration: 300ms;
+    resize: none;
+
+    &:focus {
+      border-bottom-width: 4px;
+      padding-bottom: 10px;
+    }
+  }
+
+  textarea {
+    height: 100px;
+  }
+
+  button {
+    background-color: transparentize(#117243, .15);
+    padding: 12px;
+    border-radius: 2px;
+    border: none;
+    color: #ffffff;
+    outline: none;
+  }
+}

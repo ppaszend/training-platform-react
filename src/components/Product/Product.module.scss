@@ -1,0 +1,49 @@
+.ProductWrapper {
+  display: flex;
+  flex-direction: column;
+
+  .ProductName {
+    font-size: 1.5em;
+  }
+
+  .ProductPrice {
+    display: flex;
+    justify-content: flex-end;
+    margin: 12px 0;
+  }
+
+  .ProductRating {
+    display: flex;
+    align-items: center;
+
+    .OpinionsAmount {
+      margin-left: 4px;
+    }
+  }
+
+  .AddToCart {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 8px;
+    border: none;
+    border-radius: 2px;
+
+    background-color: transparentize(#117243, .15);
+    color: #ffffff;
+
+    .BtnText {
+      display: flex;
+      justify-content: center;
+      width: calc(100% - 24px);
+      padding-left: 24px;
+      font-weight: 700;
+    }
+
+    .BtnIcon {
+      width: 24px;
+      height: 100%;
+    }
+  }
+}

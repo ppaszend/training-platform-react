@@ -1,0 +1,24 @@
+.Opinion {
+  display: flex;
+  flex-direction: column;
+  margin: 12px 0;
+
+  .OpinionAuthor {
+    font-weight: 500;
+  }
+
+  .OpinionDate {
+    font-weight: 300;
+    font-size: .8em;
+  }
+
+  .OpinionText {
+    margin-top: 6px;
+  }
+
+  .Row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+}

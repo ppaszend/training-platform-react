@@ -1,0 +1,59 @@
+.Product {
+  display: flex;
+  flex-direction: column;
+
+  padding: 0;
+  margin: 24px 0;
+
+  a {
+    text-decoration: none;
+    color: #000000;
+  }
+
+  .Name {
+    display: flex;
+    margin: 0;
+    width: 100%;
+
+    font-weight: 500;
+    color: #000000;
+    text-decoration: none;
+  }
+
+  .Description {
+    margin: 8px 0 0;
+  }
+
+  .Row {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .Price {
+    display: flex;
+  }
+
+  .AddToCart, .DeleteFromCart {
+    background-color: transparentize(#117243, .15);
+    border: none;
+    border-radius: 2px;
+    width: 36px;
+    height: 36px;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin-left: 2px;
+
+    &.Includes {
+      background-color: #2F3538;
+    }
+  }
+
+  .AddToCart {
+    margin-left: auto;
+  }
+}

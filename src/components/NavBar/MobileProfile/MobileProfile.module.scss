@@ -1,0 +1,43 @@
+.MobileProfile {
+  width: calc(100% - 80px);
+  max-width: 320px;
+  height: 100vh;
+
+  box-sizing: border-box;
+  padding: 16px;
+
+  background-color: #ffffff;
+
+  .Header {
+    display: flex;
+    padding-right: 24px;
+    margin-bottom: 24px;
+
+    .HeaderName {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+
+  .Content {
+
+  }
+}
+
+.AnimatedMobileProfile {
+  position: fixed;
+  top: 0;
+  right: -320px;
+  width: 100%;
+  height: 100vh;
+  transition-duration: 500ms;
+  z-index: 1020;
+  display: flex;
+  justify-content: flex-end;
+
+  &.Open {
+    right: 0;
+  }
+}

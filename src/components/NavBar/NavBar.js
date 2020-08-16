@@ -1,11 +1,13 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import styles from './NavBar.module.scss';
 import { faBars, faSearch, faUser, faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import IconButton from "./IconButton/IconButton";
 import { Link, useLocation } from "react-router-dom";
+import MobileProfile from "./MobileProfile/MobileProfile";
 
 function NavBar({ toggleCategories, showCategories, categories }) {
   let location = useLocation();
+  const [mobileProfile, setMobileProfile] = useState(false);
 
   useEffect(
     (props) => {
@@ -20,21 +22,19 @@ function NavBar({ toggleCategories, showCategories, categories }) {
         <Link to="/" className={styles.logo}><h1>PLANTRENINGOWY</h1></Link>
         <span className={styles.separator} />
         <IconButton icon={faSearch} />
-        <IconButton icon={faUser} />
+        <IconButton onClick={() => setMobileProfile(true)} icon={faUser} />
         <Link to="/cart"><IconButton icon={faShoppingCart} /></Link>
       </header>
-
-      {
-        <nav className={`${showCategories ? '' : styles.hidden} ${styles.categoriesNav}`}>
-          <ul>
-            {
-              categories.map(({id, name, slug}) => (
-                <li key={id}><Link to={`/category/${slug}/1`}><span>{name}</span></Link></li>
-              ))
-            }
-          </ul>
-        </nav>
-      }
+      <nav className={`${showCategories ? '' : styles.hidden} ${styles.categoriesNav}`}>
+        <ul>
+          {
+            categories.map(({id, name, slug}) => (
+              <li key={id}><Link to={`/category/${slug}/1`}><span>{name}</span></Link></li>
+            ))
+          }
+        </ul>
+      </nav>
+      <MobileProfile open={mobileProfile} setOpen={setMobileProfile} />
     </>
   )
 }

@@ -13,6 +13,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "animated-scroll-to": "^2.0.10",
+    "firebase": "^7.18.0",
     "formik": "^2.1.5",
     "graphql": "^15.3.0",
     "javascript-time-ago": "^2.0.13",

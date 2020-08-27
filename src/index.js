@@ -2,26 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
 import App from './App';
+
 import * as serviceWorker from './serviceWorker';
-import { createStore } from "redux";
-import { Provider } from 'react-redux';
 
-const menuReducer = (state=false, action) => {
-  switch (action.type) {
-    case "toggle":
-      return !state;
-    default:
-      return state;
-  }
-}
+import Firebase, {FirebaseContext} from "./components/Firebase/index";
 
-let store = createStore(menuReducer);
 
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
+    <FirebaseContext.Provider value={new Firebase()}>
       <App />
-    </Provider>
+    </FirebaseContext.Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

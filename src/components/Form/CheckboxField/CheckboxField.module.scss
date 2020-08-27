@@ -1,0 +1,40 @@
+$checkboxControlSize: 16px;
+$checkboxControlInnerSize: 10px;
+
+.CheckboxWrapper {
+  display: flex;
+  align-items: center;
+  padding: 16px 10px 10px;
+
+  .Label {
+    margin-left: 6px;
+  }
+
+  .CheckboxControl {
+    justify-content: center;
+    align-items: center;
+    width: $checkboxControlSize;
+    height: $checkboxControlSize;
+    border: 1px solid #117243;
+    border-radius: 50%;
+
+    &:after {
+      transition: background-color 300ms ease-in-out;
+      content: '';
+      display: flex;
+      width: $checkboxControlInnerSize;
+      height: $checkboxControlInnerSize;
+      margin: #{($checkboxControlSize - $checkboxControlInnerSize) / 2};
+      border-radius: 50%;
+      background-color: rgba(0, 0, 0, 0);
+    }
+  }
+
+  .Input {
+    display: none;
+
+    &:checked ~ .CheckboxControl:after {
+      background-color: #117243;
+    }
+  }
+}

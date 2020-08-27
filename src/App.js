@@ -10,6 +10,9 @@ import Cart from "./components/Cart/Cart";
 import Category from "./components/Category/Category";
 import HomePage from "./components/HomePage/HomePage";
 import Product from "./components/Product/Product";
+import Login from "./components/Login/Login";
+import Axios from "axios";
+import Register from "./components/Register/Register";
 
 class App extends React.Component{
   state = {
@@ -96,7 +99,71 @@ class App extends React.Component{
     ],
     cart: {
       products: []
-    }
+    },
+    user: {
+      isAuthenticated: false,
+      username: '',
+      email: '',
+      firstName: '',
+      lastName: '',
+      lastLogin: null
+    },
+  }
+
+  fetchUserCredentials = () => {
+    Axios({
+      method: 'GET',
+      url: 'http://127.0.0.1:8000/api/user/'
+    })
+      .then(({data}) => {
+        if (this.unmounted) return;
+        if (data.isAuthenticated) {
+          this.setState({
+            user: data
+          })
+        } else {
+            this.setState({
+              user: {
+                isAuthenticated: false,
+                username: '',
+                email: '',
+                firstName: '',
+                lastName: '',
+                lastLogin: null
+              }
+            })
+        }
+      })
+  }
+
+  loginUser = (username, password) => {
+    Axios({
+      method: 'POST',
+      url: 'http://127.0.0.1:8000/api/authenticate/',
+      data: {
+        username: username,
+        password: password
+      },
+    })
+      .then(({data}) => {
+        if (this.unmounted) return;
+        if (data.isAuthenticated) {
+          this.setState({
+            user: data
+          })
+        } else {
+          this.setState({
+            user: {
+              isAuthenticated: false,
+              username: '',
+              email: '',
+              firstName: '',
+              lastName: '',
+              lastLogin: null
+            }
+          })
+        }
+      })
   }
 
   addProductToCart = (product) => {
@@ -119,6 +186,14 @@ class App extends React.Component{
     });
   }
 
+  componentWillUnmount() {
+    this.unmounted = true;
+  }
+
+  componentDidMount() {
+    this.fetchUserCredentials();
+  }
+
   inCart = (product) => !!this.state.cart.products.find((item) => item.id === product.id);
 
   getCategoryBySlug = (slug) => this.state.categories.find((category) => category.slug === slug);
@@ -132,6 +207,7 @@ class App extends React.Component{
               categories={this.state.categories}
               showCategories={this.state.showCategories}
               toggleCategories={this.toggleCategories}
+              user={this.state.user}
             />
             <Route exact path="/" component={() => <HomePage newProducts={this.state.newProducts}
                                                              addProductToCart={this.addProductToCart}
@@ -152,6 +228,12 @@ class App extends React.Component{
                    component={({match}) => <Product match={match}
                                                     inCart={this.inCart}
                                                     addProductToCart={this.addProductToCart} />
+            } />
+            <Route exact path="/login"
+                   component={() => <Login loginUser={this.loginUser} />
+            } />
+            <Route exact path="/register"
+                   component={() => <Register />
             } />
           </div>
         </Router>

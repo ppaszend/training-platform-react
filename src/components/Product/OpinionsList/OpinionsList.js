@@ -4,25 +4,61 @@ import {ExpandMore} from "@material-ui/icons";
 import {Collapse} from "@material-ui/core";
 import Opinion from "./Opinion/Opinion";
 import Rating from "@material-ui/lab/Rating";
+import Axios from "axios";
 
 class OpinionsList extends React.Component {
   state = {
-    rating: 1
+    page: 1,
+    pagesAmount: 0,
+    opinions: [],
+  }
+
+  fetchOpinions = (page) => {
+    Axios({
+      method: 'GET',
+      url: `http://127.0.0.1:8000/api/opinions/?product__slug=${this.props.productSlug}&page=${page}&limit=10`
+    })
+      .then(({data}) => {
+        if (this.unmounted) return;
+        this.setState((prevState) => ({
+          opinions: [...prevState.opinions, ...data.opinions.map((opinion) => ({...opinion, date: new Date(opinion.date)}))],
+          pagesAmount: data.pagesAmount,
+        }))
+      })
   }
 
   addOpinion = (e) => {
     e.preventDefault();
-    // todo: sending opinion to server
-    console.log({
-      name: e.target.querySelector('[name="add-opinion--name"]'),
-      text: e.target.querySelector('[name="add-opinion--text"]'),
-      rating: [...e.target.querySelectorAll('[name="add-opinion--rating"]')].find((ele) => ele.checked).value
-    });
-    this.props.addOpinion(
-      e.target.querySelector('[name="add-opinion--name"]').value,
-      e.target.querySelector('[name="add-opinion--text"]').value,
-      [...e.target.querySelectorAll('[name="add-opinion--rating"]')].find((ele) => ele.checked).value
-    )
+    this.props.incrementOpinionsAmount();
+    Axios({
+      method: 'POST',
+      url: 'http://127.0.0.1:8000/api/opinion/',
+      data: {
+        author: e.target.querySelector('[name="add-opinion--name"]').value,
+        text: e.target.querySelector('[name="add-opinion--text"]').value,
+        rate: [...e.target.querySelectorAll('[name="add-opinion--rating"]')].find((ele) => ele.checked).value,
+        product__slug: this.props.productSlug
+      }
+    })
+      .then(({data}) => {
+        if (this.unmounted) return;
+        this.setState((prevState) => ({opinions: [...prevState.opinions, {
+            id: data.id,
+            author: data.author,
+            text: data.text,
+            rating: parseInt(data.rating),
+            date: new Date(data.date),
+          }]
+        }))
+      })
+  }
+
+  componentDidMount() {
+    this.fetchOpinions(1);
+  }
+
+  componentWillUnmount() {
+    this.unmounted = true;
   }
 
   render() {
@@ -57,11 +93,23 @@ class OpinionsList extends React.Component {
             </div>
             <ul className={styles.OpinionsList}>
               {
-                this.props.opinions.sort((a, b) => a > b ? 1 : -1).map((opinion) => (
+                this.state.opinions.sort((a, b) => a > b ? 1 : -1).map((opinion) => (
                   <Opinion opinion={opinion} key={opinion.id} value={this.state.rating} />
                 ))
               }
             </ul>
+            {
+              this.state.page < this.state.pagesAmount && (
+                <button onClick={() => {
+                  this.fetchOpinions(this.state.page + 1);
+                  this.setState((prevState)=> {
+                    return {
+                      page: prevState.page++
+                    }
+                  })
+                }} className={`Button Button--gray`}>Wyświetl więcej opinii</button>
+              )
+            }
           </div>
         </Collapse>
       </section>

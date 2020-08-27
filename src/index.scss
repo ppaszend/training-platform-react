@@ -29,9 +29,19 @@ input.FormInput {
   padding: 12px;
   color: #ffffff;
   text-decoration: none;
-  background-color: transparentize(#117243, .15);
   margin: 12px 0;
   border-radius: 2px;
+  border: none;
   justify-content: center;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+
+  &.Button--green {
+    background-color: transparentize(#117243, .15);
+  }
+
+  &.Button--gray {
+    background-color: #939598;
+  }
 }

@@ -5,6 +5,7 @@ import { AddShoppingCart } from "@material-ui/icons";
 import OpinionsList from "./OpinionsList/OpinionsList";
 import Rating from "@material-ui/lab/Rating";
 import animateScrollTo from "animated-scroll-to";
+import Axios from "axios";
 
 class Product extends React.Component {
   state = {
@@ -18,53 +19,31 @@ class Product extends React.Component {
     sections: {
       opinions: true,
     },
-    opinions: [],
-    opinionsAnimationTime: 'auto'
+    opinionsAnimationTime: 'auto',
+    opinionsAmount: 0
   }
 
   fetchProductData = () => {
-    // todo: fetching product from api (example data below)
-    this.setState({product: {
-      id: 20,
-      name: 'Lorem ipsum',
-      description: 'Donec purus purus, facilisis vitae hendrerit quis, malesuada sed magna. Donec sed ullamcorper ipsum. Vestibulum tempor, elit vitae interdum finibus, est lacus mollis ex, vitae pulvinar urna arcu vitae dui. Proin fringilla diam ut sem pulvinar, id ullamcorper elit efficitur. Etiam nibh dolor, finibus eget enim eu, pellentesque suscipit tortor. Aenean quis nibh sed lacus dapibus condimentum vel eget ligula. Vestibulum varius ipsum eget congue ultrices. Integer a urna eros. Morbi sit amet malesuada sapien. In eros nisi, convallis vel lobortis eu, rhoncus id odio. Nulla eu pretium orci, at dignissim sem. Quisque sed libero a eros rutrum rhoncus. Cras placerat elit non varius hendrerit.',
-      price: 9.99,
-      rating: 3.5
-    },
-      opinions: [
-        {
-          id: 11,
-          author: 'Paweł Paszenda',
-          text: 'Donec congue ultrices neque eget vulputate. Sed egestas aliquet est, sagittis auctor urna consectetur eu. Phasellus fermentum ullamcorper lacinia. In a ultrices elit. Vestibulum luctus, nibh ac sagittis vulputate, massa leo scelerisque urna, non aliquam est sapien et ante. Phasellus pretium tellus vitae justo condimentum pulvinar.',
-          rating: 5,
-          date: new Date(2019, 5, 21)
-        },
-        {
-          id: 12,
-          author: 'Paweł Paszenda',
-          text: 'Donec congue ultrices neque eget vulputate. Sed egestas aliquet est, sagittis auctor urna consectetur eu. Phasellus fermentum ullamcorper lacinia. In a ultrices elit. Vestibulum luctus, nibh ac sagittis vulputate, massa leo scelerisque urna, non aliquam est sapien et ante. Phasellus pretium tellus vitae justo condimentum pulvinar.',
-          rating: 4.5,
-          date: new Date(2020, 7, 1)
-        },
-        {
-          id: 13,
-          author: 'Paweł Paszenda',
-          text: 'Donec congue ultrices neque eget vulputate. Sed egestas aliquet est, sagittis auctor urna consectetur eu. Phasellus fermentum ullamcorper lacinia. In a ultrices elit. Vestibulum luctus, nibh ac sagittis vulputate, massa leo scelerisque urna, non aliquam est sapien et ante. Phasellus pretium tellus vitae justo condimentum pulvinar.',
-          rating: 2.5,
-          date: new Date(2020, 7, 15)
-        },
-      ]
-    });
+    Axios({
+      method: 'GET',
+      url: `http://127.0.0.1:8000/api/product/?slug=${this.props.match.params.slug}`,
+    })
+      .then(({data}) => {
+        if (this.unmounted) return;
+        this.setState({
+          product: {
+            name: data.name,
+            description: data.description,
+            price: data.price,
+            rating: data.rating
+          },
+          opinionsAmount: data.opinionsAmount
+        })
+      })
   }
 
-  addOpinion = (name, text, rating) => {
-    this.setState((prevState) => ({opinions: [...prevState.opinions, {
-      id: 200,
-      author: name,
-      text: text,
-      rating: parseInt(rating),
-      date: new Date(Date.now()),
-    }]}))
+  componentWillUnmount() {
+    this.unmounted = true;
   }
 
   componentDidMount() {
@@ -77,7 +56,15 @@ class Product extends React.Component {
   }}));
 
   render() {
-    const opinionsAmount = this.state.opinions.length;
+    let opinionsAmount = this.state.opinionsAmount;
+
+    if (opinionsAmount === 1) {
+      opinionsAmount += ' opinia'
+    } else if (opinionsAmount > 4 || opinionsAmount === 0) {
+      opinionsAmount += ' opinii'
+    } else {
+      opinionsAmount += ' opinie'
+    }
 
     return (
       this.state.product ? (
@@ -92,8 +79,8 @@ class Product extends React.Component {
                 this.setState({opinionsAnimationTime: 'auto'});
                 animateScrollTo(document.querySelector('#opinions').offsetTop - 35)
               }}
-                   className={styles.OpinionsAmount} >
-                ({opinionsAmount} {(opinionsAmount === 1 && 'opinia') || (opinionsAmount > 4 && 'opinii') || 'opinie'})</div>
+                   className={styles.OpinionsAmount}>
+                ({opinionsAmount})</div>
             </div>
             <p>{this.state.product.description}</p>
             <div className={styles.ProductPrice}>{this.state.product.price} zł</div>
@@ -105,11 +92,13 @@ class Product extends React.Component {
               </div>
             </button>
           </section>
-          <OpinionsList opinions={this.state.opinions}
-                        show={this.state.sections.opinions}
+          <OpinionsList show={this.state.sections.opinions}
                         toggle={this.toggleOpinions}
                         animationTime={this.state.opinionsAnimationTime}
-                        addOpinion={this.addOpinion}
+                        productSlug={this.props.match.params.slug}
+                        incrementOpinionsAmount={() => this.setState((prevState) => (
+                          {opinionsAmount: prevState.opinionsAmount++}
+                          ))}
           />
         </>
       ) : <Loading/>

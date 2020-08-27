@@ -10,25 +10,34 @@ class MobileProfile extends React.Component {
 
   render() {
     return (
-      <div className={`${styles.AnimatedMobileProfile} ${this.state.animationOpen ? styles.Open : ''}`}>
+      <div className={`${styles.AnimatedMobileProfile} ${this.props.open ? styles.Open : ''}`}>
         {
           this.props.open && (
             <div className={styles.MobileProfile}>
               <div className={styles.Header}>
                 <Close onClick={() => {
-                  new Promise((resolve) => {
-                    this.setState({animationOpen: false})
-                    setTimeout(() => {
-                      resolve();
-                    }, 500);
-                  })
-                    .then(() => this.props.setOpen(false))
+                  this.props.setOpen(false)
                 }} />
                 <span className={styles.HeaderName}>Twój profil</span>
               </div>
               <div className={styles.Content}>
-                <Link className="Button" to="/login">Zaloguj się</Link>
-                <Link className="Button" to="/register">Zarejestruj się</Link>
+                {
+                  !this.props.user.isAuthenticated && (
+                    <>
+                      <Link className="Button Button--gray" to="/login">Zaloguj się</Link>
+                      <Link className="Button Button--gray" to="/register">Zarejestruj się</Link>
+                    </>
+                  )
+                }
+                {
+                  this.props.user.isAuthenticated && (
+                    <>
+                      <div className={styles.UserProfile}>
+                        {this.props.user.username} {this.props.user.firstName} {this.props.user.lastName}
+                      </div>
+                    </>
+                  )
+                }
               </div>
             </div>
           )

@@ -1,0 +1,59 @@
+.InputWrapper {
+  display: flex;
+  position: relative;
+
+  .Placeholder {
+    position: absolute;
+    top: 20px;
+    left: 12px;
+    transition-duration: 150ms;
+    z-index: 100;
+
+    font-size: 1em;
+    color: #2F3538;
+
+    &.Minimize {
+      top: 4px;
+      left: 4px;
+      font-size: .7em;
+    }
+  }
+
+  .Icon {
+    position: absolute;
+    right: 4px;
+    top: 20px;
+    height: 24px;
+    width: 24px;
+    color: #28a745;
+  }
+
+  .Input {
+    width: 100%;
+    padding: 16px 12px 12px;
+    margin: 4px 0;
+    border-radius: 2px;
+    border: none;
+    box-sizing: border-box;
+    border-bottom: 2px solid #117243;
+    font-family: Roboto;
+    font-size: 1em;
+    outline: none;
+    transition-duration: 150ms;
+
+    &:focus {
+      border-bottom-width: 4px;
+      padding-bottom: 10px;
+    }
+
+    &::placeholder {
+      visibility: hidden;
+    }
+
+    &:-webkit-autofill {
+      &, &:focus, &:hover, &:active {
+        -webkit-box-shadow: 0 0 0 1000px #ffffff inset;
+      }
+    }
+  }
+}

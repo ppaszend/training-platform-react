@@ -1,0 +1,54 @@
+$radioControlSize: 16px;
+$radioControlInnerSize: 10px;
+
+.RadioGroup {
+  display: flex;
+  flex-direction: column;
+  margin: 8px;
+
+  .RadioGroupName {
+    margin-left: 4px;
+  }
+
+  .InputsList {
+    display: flex;
+  }
+
+  .RadioWrapper {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+
+    .Label {
+      margin-left: 6px;
+    }
+
+    .RadioControl {
+      justify-content: center;
+      align-items: center;
+      width: $radioControlSize;
+      height: $radioControlSize;
+      border: 1px solid #117243;
+      border-radius: 50%;
+
+      &:after {
+        transition: background-color 300ms ease-in-out;
+        content: '';
+        display: flex;
+        width: $radioControlInnerSize;
+        height: $radioControlInnerSize;
+        margin: #{($radioControlSize - $radioControlInnerSize) / 2};
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, 0);
+      }
+    }
+
+    .Input {
+      display: none;
+
+      &:checked ~ .RadioControl:after {
+        background-color: #117243;
+      }
+    }
+  }
+}

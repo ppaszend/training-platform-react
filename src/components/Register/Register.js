@@ -16,7 +16,7 @@ function Register() {
                   options={[
                     { label: 'Mężczyzna', value: 'm', checked: true },
                     { label: 'Kobieta', value: 'k' }
-                    ]}
+                  ]}
                   label="Płeć" />
       <CheckboxField name="terms">Akceptuję regulamin sklepu</CheckboxField>
       <SubmitButton>Zarejestruj się</SubmitButton>

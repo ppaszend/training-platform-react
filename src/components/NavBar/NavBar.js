@@ -5,7 +5,7 @@ import IconButton from "./IconButton/IconButton";
 import { Link, useLocation } from "react-router-dom";
 import MobileProfile from "./MobileProfile/MobileProfile";
 
-function NavBar({ toggleCategories, showCategories, categories, user }) {
+function NavBar({ toggleCategories, showCategories, categories, user, openSidebar }) {
   let location = useLocation();
   const [mobileProfile, setMobileProfile] = useState(false);
 
@@ -22,7 +22,7 @@ function NavBar({ toggleCategories, showCategories, categories, user }) {
         <Link to="/" className={styles.logo}><h1>PLANTRENINGOWY</h1></Link>
         <span className={styles.separator} />
         <IconButton icon={faSearch} />
-        <IconButton onClick={() => setMobileProfile(true)} icon={faUser} />
+        <IconButton onClick={openSidebar} icon={faUser} />
         <Link to="/cart"><IconButton icon={faShoppingCart} /></Link>
       </header>
       <nav className={`${showCategories ? '' : styles.hidden} ${styles.categoriesNav}`}>
@@ -34,10 +34,10 @@ function NavBar({ toggleCategories, showCategories, categories, user }) {
           }
         </ul>
       </nav>
-      <MobileProfile open={mobileProfile}
-                     setOpen={setMobileProfile}
-                     user={user}
-      />
+      {/*<MobileProfile open={mobileProfile}*/}
+      {/*               setOpen={setMobileProfile}*/}
+      {/*               user={user}*/}
+      {/*/>*/}
     </>
   )
 }

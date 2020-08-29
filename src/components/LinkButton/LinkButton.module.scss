@@ -1,0 +1,26 @@
+.LinkButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 10px;
+  margin: 5px 0;
+  font-size: 1.1em;
+  text-decoration: none;
+
+  &.Green {
+    background-color: #117243;
+    color: #ffffff;
+  }
+
+  &.Gray {
+    background-color: #939598;
+    color: #000000;
+  }
+
+  &.Dark {
+    background-color: #2F3538;
+    color: #ffffff;
+  }
+}

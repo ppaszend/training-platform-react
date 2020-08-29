@@ -6,6 +6,7 @@ import PasswordField from "./PasswordField/PasswordField";
 import RadioGroup from "./RadioGroup/RadioGroup";
 import SubmitButton from "./SubmitButton/SubmitButton";
 import CheckboxField from "./CheckboxField/CheckboxField";
+import FormGroup from "./FormGroup/FormGroup";
 
 function Form(props) {
   const onSubmit = (e) => {
@@ -19,11 +20,12 @@ function Form(props) {
     <form className={styles.Form}
           onSubmit={onSubmit}
           noValidate={true} >
+      {props.formLabel && <h2 className={styles.FormLabel}>{props.formLabel}</h2>}
       {props.children}
     </form>
   )
 }
 
-export {InputField, EmailField, PasswordField, RadioGroup, SubmitButton, CheckboxField};
+export {InputField, EmailField, PasswordField, RadioGroup, SubmitButton, CheckboxField, FormGroup};
 
 export default Form;

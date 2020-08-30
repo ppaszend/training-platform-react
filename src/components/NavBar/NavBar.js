@@ -1,17 +1,16 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect} from "react";
 import styles from './NavBar.module.scss';
 import { faBars, faSearch, faUser, faShoppingCart } from "@fortawesome/free-solid-svg-icons";
 import IconButton from "./IconButton/IconButton";
 import { Link, useLocation } from "react-router-dom";
-import MobileProfile from "./MobileProfile/MobileProfile";
 
 function NavBar({ toggleCategories, showCategories, categories, user, openSidebar }) {
   let location = useLocation();
-  const [mobileProfile, setMobileProfile] = useState(false);
 
   useEffect(
     (props) => {
-      toggleCategories(undefined, false);
+      console.log(props);
+      toggleCategories(false);
     }, [location.pathname]
   )
 

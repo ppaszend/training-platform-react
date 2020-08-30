@@ -1,5 +1,5 @@
 import React from "react";
-import Loading from "../Loading/Loading";
+import Loading from "../../components/Loading/Loading";
 import styles from './Product.module.scss';
 import { AddShoppingCart } from "@material-ui/icons";
 import OpinionsList from "./OpinionsList/OpinionsList";
@@ -26,18 +26,13 @@ class Product extends React.Component {
   fetchProductData = () => {
     Axios({
       method: 'GET',
-      url: `http://127.0.0.1:8000/api/product/?slug=${this.props.match.params.slug}`,
+      url: `http://127.0.0.1:8000/api/product/${this.props.match.params.slug}/`,
     })
       .then(({data}) => {
         if (this.unmounted) return;
         this.setState({
-          product: {
-            name: data.name,
-            description: data.description,
-            price: data.price,
-            rating: data.rating
-          },
-          opinionsAmount: data.opinionsAmount
+          product: data.product,
+          opinionsAmount: data.opinionsAmount || 0,
         })
       })
   }

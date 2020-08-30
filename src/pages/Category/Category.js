@@ -1,5 +1,5 @@
 import React from "react";
-import ProductsList from "../ProductsList/ProductsList";
+import ProductsList from "../../components/ProductsList/ProductsList";
 import {Pagination} from "@material-ui/lab";
 import {Link} from 'react-router-dom';
 
@@ -51,7 +51,6 @@ class Category extends React.Component {
         <Pagination count={category.amountOfPages}
                     onChange={this.goToPage}
                     renderItem={(item) => {
-                      console.log(item);
                       if (item.type === 'page') {
                         return (
                           <Link to={`/category/${this.props.match.params.slug}/${item.page}`}>{item.page}</Link>

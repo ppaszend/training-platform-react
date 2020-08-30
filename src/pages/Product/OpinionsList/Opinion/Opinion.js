@@ -17,7 +17,7 @@ class Opinion extends React.Component {
         <div className={styles.Row}>
           <div className={styles.Group}>
             <div className={styles.OpinionAuthor}>{this.props.opinion.author}</div>
-            <div className={styles.OpinionDate}>{this.timeAgo.format(this.props.opinion.date)}</div>
+            <div className={styles.OpinionDate}>{this.timeAgo.format(this.props.opinion.created)}</div>
           </div>
           <div className={styles.Group}>
             <Rating name="half-rating-read" defaultValue={this.props.opinion.rate} precision={0.5} readOnly />

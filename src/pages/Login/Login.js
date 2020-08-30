@@ -1,5 +1,5 @@
 import React from "react";
-import Form, {InputField, PasswordField, SubmitButton} from "../Form/Form";
+import Form, {InputField, PasswordField, SubmitButton} from "../../components/Form/Form";
 
 class Login extends React.Component {
   state = {

@@ -5,10 +5,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 class IconButton extends React.Component {
   render() {
     return (
-      <button className={styles.btn}>
-        <FontAwesomeIcon icon={this.props.icon}
-                         onClick={this.props.onClick}
-        />
+      <button className={styles.btn} onClick={this.props.onClick}>
+        <FontAwesomeIcon icon={this.props.icon} />
       </button>
     );
   }

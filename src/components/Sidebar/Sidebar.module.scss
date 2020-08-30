@@ -8,16 +8,12 @@ $sidebarWidth: 320px;
   width: 100vw;
   height: 100vh;
   z-index: 1010;
-  background-color: rgba(0, 0, 0, .1);
+  background-color: rgba(0, 0, 0, .3);
   transition: background-color 300ms ease-in-out;
 
   &.Hide {
     display: none;
     background-color: rgba(0, 0, 0, 0);
-
-    & ~ .Sidebar {
-      right: #{0 - $sidebarWidth};
-    }
   }
 }
 
@@ -25,15 +21,33 @@ $sidebarWidth: 320px;
   display: flex;
   flex-direction: column;
   position: fixed;
-  right: 0;
   top: 0;
   z-index: 1020;
-  transition: right 300ms ease-in-out;
   background-color: #ffffff;
   width: $sidebarWidth;
   height: 100vh;
   padding: 10px;
   box-sizing: border-box;
+
+  &.SideLeft {
+    left: 0;
+    transition: left 300ms ease-in-out;
+  }
+
+  &.SideRight {
+    right: 0;
+    transition: right 300ms ease-in-out;
+  }
+
+  &.Hide {
+    &.SideLeft {
+      left: #{0 - $sidebarWidth};
+    }
+
+    &.SideRight {
+      right: #{0 - $sidebarWidth};
+    }
+  }
 
   .Header {
     display: flex;

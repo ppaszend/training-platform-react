@@ -7,7 +7,7 @@ import Form, {
   PasswordField,
   RadioGroup,
   SubmitButton
-} from "../Form/Form";
+} from "../../components/Form/Form";
 
 function Register() {
   const submitHandler = (data) => {

@@ -5,14 +5,14 @@ import {Link} from "react-router-dom";
 const colors = {
   green: 'Green',
   gray: 'Gray',
-  dark: 'Dark'
+  dark: 'Dark',
+  white: 'White'
 }
 
 function LinkButton(props) {
   return (
     <Link className={`${styles.LinkButton} ${styles[colors[props.color]]}`}
-       to={props.to}
-    >{props.children}</Link>
+          to={props.to}>{props.children}</Link>
   )
 }
 

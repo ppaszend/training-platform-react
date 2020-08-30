@@ -13,7 +13,9 @@ function Form(props) {
     e.preventDefault();
     const formFields = [...e.target.querySelectorAll('input:not([type=radio])'),
                         ...e.target.querySelectorAll('input[type=radio]:checked')];
-    props.onSubmit(Object.fromEntries(formFields.map(input => [input.getAttribute('name'), input.value])));
+    props.onSubmit(Object.fromEntries(formFields.map(input => (
+      [input.getAttribute('name'), input.getAttribute('type') === 'checkbox' ? input.checked : input.value]
+    ))));
   }
 
   return (

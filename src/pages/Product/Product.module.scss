@@ -1,9 +1,14 @@
 .ProductWrapper {
   display: flex;
   flex-direction: column;
+  padding: 10px;
+  background-color: #ffffff;
+  margin: 0 10px;
 
   .ProductName {
     font-size: 1.5em;
+    margin-top: 0;
+    margin-bottom: 5px;
   }
 
   .ProductPrice {
@@ -46,4 +51,12 @@
       height: 100%;
     }
   }
+}
+
+.Error {
+  display: flex;
+  font-size: 1.2em;
+  background-color: #ffffff;
+  padding: 10px;
+  margin: 0 10px 10px;
 }

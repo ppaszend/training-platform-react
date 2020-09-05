@@ -1,12 +1,20 @@
 import React from 'react';
 import styles from './Form.module.scss';
+
+// Widgets
 import InputField from "./InputField/InputField";
 import EmailField from "./EmailField/EmailField";
 import PasswordField from "./PasswordField/PasswordField";
 import RadioGroup from "./RadioGroup/RadioGroup";
 import SubmitButton from "./SubmitButton/SubmitButton";
 import CheckboxField from "./CheckboxField/CheckboxField";
+import IconButton from "./IconButton/IconButton";
+
+// Layout
+import FormRow from "./FormRow/FormRow";
 import FormGroup from "./FormGroup/FormGroup";
+
+
 
 function Form(props) {
   const onSubmit = (e) => {
@@ -28,6 +36,7 @@ function Form(props) {
   )
 }
 
-export {InputField, EmailField, PasswordField, RadioGroup, SubmitButton, CheckboxField, FormGroup};
+export {InputField, EmailField, PasswordField, RadioGroup, SubmitButton, CheckboxField, FormGroup, IconButton,
+        FormRow};
 
 export default Form;

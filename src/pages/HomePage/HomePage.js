@@ -6,7 +6,7 @@ function HomePage(props) {
     {
       id: 0,
       name: 'Lorem Ipsum',
-      slug: 'lorem-ipsum',
+      slug: 'dupa',
       description: 'Lorem ipsum dolor sit amet.',
       price: 19.99
     },

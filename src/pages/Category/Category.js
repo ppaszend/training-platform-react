@@ -2,29 +2,13 @@ import React from "react";
 import ProductsList from "../../components/ProductsList/ProductsList";
 import {Pagination} from "@material-ui/lab";
 import {Link} from 'react-router-dom';
+import {get_category_products} from "../../api";
 
 class Category extends React.Component {
   state = {
-    name: 'kategoria 1',
-    amountOfPages: 12,
-    pages: [
-      [
-        {
-          id: 43,
-          name: 'Lorem Ipsum 22',
-          slug: 'lorem-ipsum',
-          description: 'Lorem ipsum dolor sit amet.',
-          price: 49.99
-        },
-        {
-          id: 54,
-          name: 'Dolor sit 23',
-          slug: 'dolor-sit',
-          description: 'Lorem ipsum dolor sit amet.',
-          price: 59.99
-        }
-      ]
-    ]
+    name: '',
+    amountOfPages: 0,
+    pages: [],
   }
 
   getPage = (page) => {
@@ -35,20 +19,27 @@ class Category extends React.Component {
     }
   }
 
-  // goToPage = (e, page) => this.props.history.push(`/category/${this.props.match.params.slug}/${page}`);
+  componentDidMount() {
+    get_category_products(this.props.match.params.slug, this.props.match.params.page, 10)
+      .then(({data}) => {
+        this.setState((prevState) => ({
+          pages: [...prevState.pages, data.products],
+          name: data.name,
+          amountOfPages: data.pagesAmount
+        }))
+      })
+  }
 
   render() {
-    const category = this.props.getCategoryBySlug(this.props.match.params.slug);
-
     return (
       <>
-        <h2>{category.name}{this.props.match.params.page}</h2>
+        <h2>{this.state.name}{this.props.match.params.page}</h2>
         <ProductsList items={this.getPage(this.props.match.params.page)}
                       inCart={this.props.inCart}
                       addProductToCart={this.props.addProductToCart}
 
         />
-        <Pagination count={category.amountOfPages}
+        <Pagination count={this.state.amountOfPages}
                     onChange={this.goToPage}
                     renderItem={(item) => {
                       if (item.type === 'page') {

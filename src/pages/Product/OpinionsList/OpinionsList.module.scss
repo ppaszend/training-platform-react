@@ -1,6 +1,9 @@
 .OpinionWrapper {
   display: flex;
   flex-direction: column;
+  padding: 10px;
+  background-color: #ffffff;
+  margin: 0 10px 10px;
 
   &.Expanded {
     .SectionHeader {

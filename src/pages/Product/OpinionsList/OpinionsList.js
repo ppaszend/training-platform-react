@@ -5,6 +5,7 @@ import {Collapse} from "@material-ui/core";
 import Opinion from "./Opinion/Opinion";
 import Rating from "@material-ui/lab/Rating";
 import Axios from "axios";
+import {add_opinion} from "../../../api";
 
 class OpinionsList extends React.Component {
   state = {
@@ -16,12 +17,16 @@ class OpinionsList extends React.Component {
   fetchOpinions = (page) => {
     Axios({
       method: 'GET',
-      url: `http://127.0.0.1:8000/api/opinions/${this.props.productSlug}/?offset=${page * 10}&limit=10`
+      url: `http://127.0.0.1:8000/api/opinions/${this.props.productSlug}/?offset=${(page - 1) * 10}&limit=10`
     })
       .then(({data}) => {
         if (this.unmounted) return;
         this.setState((prevState) => ({
-          opinions: [...prevState.opinions, ...data.map((opinion) => ({...opinion, created: new Date(opinion.created)}))],
+          opinions: [
+            ...prevState.opinions,
+            ...data.opinions
+              .map((opinion) => ({...opinion, created: new Date(opinion.created)}))
+          ].sort((a, b) => a.created - b.created),
           pagesAmount: data.pagesAmount,
         }))
       })
@@ -30,15 +35,11 @@ class OpinionsList extends React.Component {
   addOpinion = (e) => {
     e.preventDefault();
     this.props.incrementOpinionsAmount();
-    Axios({
-      method: 'POST',
-      url: `http://127.0.0.1:8000/api/opinion/${this.props.productSlug}/`,
-      data: {
-        author: e.target.querySelector('[name="add-opinion--name"]').value,
-        text: e.target.querySelector('[name="add-opinion--text"]').value,
-        rate: [...e.target.querySelectorAll('[name="add-opinion--rating"]')].find((ele) => ele.checked).value,
-      }
-    })
+    add_opinion({
+      author: e.target.querySelector('[name="add-opinion--name"]').value,
+      text: e.target.querySelector('[name="add-opinion--text"]').value,
+      rate: [...e.target.querySelectorAll('[name="add-opinion--rating"]')].find((ele) => ele.checked).value,
+    }, this.props.productSlug)
       .then(({data}) => {
         if (this.unmounted) return;
         this.setState((prevState) => ({opinions: [...prevState.opinions, {
@@ -46,7 +47,7 @@ class OpinionsList extends React.Component {
             author: data.author,
             text: data.text,
             rating: parseInt(data.rating),
-            date: new Date(data.date),
+            created: new Date(data.created),
           }]
         }))
       })

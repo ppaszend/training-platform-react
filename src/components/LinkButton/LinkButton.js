@@ -11,8 +11,13 @@ const colors = {
 
 function LinkButton(props) {
   return (
-    <Link className={`${styles.LinkButton} ${styles[colors[props.color]]}`}
-          to={props.to}>{props.children}</Link>
+    props.to ? (
+      <Link className={`${styles.LinkButton} ${styles[colors[props.color]]}`}
+            to={props.to}>{props.children}</Link>
+    ) : (
+      <button onClick={props.onClick} className={`${styles.LinkButton} ${styles[colors[props.color]]}`}
+              to={props.to}>{props.children}</button>
+    )
   )
 }
 

@@ -1,104 +1,99 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Loading from "../../components/Loading/Loading";
 import styles from './Product.module.scss';
 import { AddShoppingCart } from "@material-ui/icons";
 import OpinionsList from "./OpinionsList/OpinionsList";
 import Rating from "@material-ui/lab/Rating";
 import animateScrollTo from "animated-scroll-to";
-import Axios from "axios";
+import {get_product} from "../../api";
+import {useLocation} from 'react-router-dom';
+import Typography from '@material-ui/core/Typography';
+import Breadcrumbs from '@material-ui/core/Breadcrumbs';
+import MaterialLink from "@material-ui/core/Link";
 
-class Product extends React.Component {
-  state = {
-    product: {
-      id: null,
-      name: '',
-      description: '',
-      price: null,
-      rating: null
-    },
-    sections: {
-      opinions: true,
-    },
-    opinionsAnimationTime: 'auto',
-    opinionsAmount: 0
-  }
+function Product(props) {
+  const location = useLocation();
 
-  fetchProductData = () => {
-    Axios({
-      method: 'GET',
-      url: `http://127.0.0.1:8000/api/product/${this.props.match.params.slug}/`,
-    })
-      .then(({data}) => {
-        if (this.unmounted) return;
-        this.setState({
-          product: data.product,
-          opinionsAmount: data.opinionsAmount || 0,
-        })
+  const [product, setProduct] = useState({});
+  const [sections, setSections] = useState({opinions: true,});
+  const [opinionsAnimationTime, setOpinionsAnimationTime] = useState('auto');
+  const [opinionsAmount, setOpinionsAmount] = useState(0);
+  const [error, setError] = useState(false);
+
+  const fetchProductData = () => {
+    get_product(props.match.params.slug)
+      .then(({data, status}) => {
+        setProduct({...data.product, category: {name: data.category.name}});
+        setOpinionsAmount(data.opinionsAmount || 0);
+        setError(false);
+      })
+      .catch(() => {
+        setError(true);
       })
   }
 
-  componentWillUnmount() {
-    this.unmounted = true;
-  }
+  useEffect(() => {
+    fetchProductData();
+  }, [props.location]);
 
-  componentDidMount() {
-    this.fetchProductData();
-  }
+  const toggleOpinions = (newState) => setSections({
+    ...sections,
+    opinions: typeof newState !== "boolean" ? !sections.opinions : newState
+  });
 
-  toggleOpinions = (newState) => this.setState((prevState) => ({sections: {
-    ...prevState.sections,
-    opinions: typeof newState !== "boolean" ? !prevState.sections.opinions : newState
-  }}));
-
-  render() {
-    let opinionsAmount = this.state.opinionsAmount;
-
-    if (opinionsAmount === 1) {
-      opinionsAmount += ' opinia'
-    } else if (opinionsAmount > 4 || opinionsAmount === 0) {
-      opinionsAmount += ' opinii'
-    } else {
-      opinionsAmount += ' opinie'
-    }
-
-    return (
-      this.state.product ? (
-        <>
-          <section className={styles.ProductWrapper}>
-            <h1 className={styles.ProductName}>{this.state.product.name}</h1>
-            <div className={styles.ProductRating}>
-              <Rating name="half-rating-read" value={this.state.product.rating} precision={0.5} readOnly />
-              <div onClick={() => {
-                this.setState({opinionsAnimationTime: 0});
-                this.toggleOpinions(true);
-                this.setState({opinionsAnimationTime: 'auto'});
-                animateScrollTo(document.querySelector('#opinions').offsetTop - 35)
-              }}
-                   className={styles.OpinionsAmount}>
-                ({opinionsAmount})</div>
-            </div>
-            <p>{this.state.product.description}</p>
-            <div className={styles.ProductPrice}>{this.state.product.price} zł</div>
-            <button className={styles.AddToCart}
-                    onClick={() => this.props.addProductToCart(this.state.product)} >
-              <div className={styles.BtnText}>Dodaj do koszyka</div>
-              <div className={styles.BtnIcon}>
-                <AddShoppingCart />
+  return (
+    <>
+      {
+        product && (
+          <>
+            <section className={styles.ProductWrapper}>
+              <Breadcrumbs aria-label="breadcrumb">
+                <MaterialLink color="inherit" href="/">
+                  plantreningowy.pl
+                </MaterialLink>
+                <MaterialLink>
+                  {}
+                </MaterialLink>
+              </Breadcrumbs>
+              <h1 className={styles.ProductName}>{product.name}</h1>
+              <div className={styles.ProductRating}>
+                <Rating name="half-rating-read" value={parseFloat(product.rating)} precision={0.5} readOnly />
+                <div onClick={() => {
+                  setOpinionsAnimationTime(0);
+                  toggleOpinions(true);
+                  setOpinionsAnimationTime('auto');
+                  animateScrollTo(document.querySelector('#opinions').offsetTop - 35)
+                }}
+                     className={styles.OpinionsAmount}>
+                  ({opinionsAmount})</div>
               </div>
-            </button>
-          </section>
-          <OpinionsList show={this.state.sections.opinions}
-                        toggle={this.toggleOpinions}
-                        animationTime={this.state.opinionsAnimationTime}
-                        productSlug={this.props.match.params.slug}
-                        incrementOpinionsAmount={() => this.setState((prevState) => (
-                          {opinionsAmount: prevState.opinionsAmount++}
-                          ))}
-          />
-        </>
-      ) : <Loading/>
-    )
-  }
+              <p>{product.description}</p>
+              <div className={styles.ProductPrice}>{product.price} zł</div>
+              <button className={styles.AddToCart}
+                      onClick={() => props.addProductToCart(product)} >
+                <div className={styles.BtnText}>Dodaj do koszyka</div>
+                <div className={styles.BtnIcon}>
+                  <AddShoppingCart />
+                </div>
+              </button>
+            </section>
+            <OpinionsList show={sections.opinions}
+                          toggle={toggleOpinions}
+                          animationTime={opinionsAnimationTime}
+                          productSlug={props.match.params.slug}
+                          incrementOpinionsAmount={() => setOpinionsAmount(opinionsAmount + 1)}
+            />
+          </>
+        )
+      }
+      {
+        !product && !error && <Loading/>
+      }
+      {
+        error && <div className={styles.Error}>Podany produkt nie został znaleziony</div>
+      }
+    </>
+  )
 }
 
 export default Product;

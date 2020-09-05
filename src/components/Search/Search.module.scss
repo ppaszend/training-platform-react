@@ -1,0 +1,29 @@
+.SearchWrapper {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 8px;
+  width: 100%;
+  height: calc(100% - 8px);
+  background-color: rgba(255, 255, 255, 1);
+  z-index: 2000;
+  transition: top 500ms cubic-bezier(.37,.52,.5,.92);
+  border-radius: 8px;
+  box-sizing: border-box;
+  padding: 4px;
+
+  &.Hide {
+    top: 100vh;
+  }
+
+  .Head {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .Body {
+    display: flex;
+    flex-direction: column;
+  }
+}

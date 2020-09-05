@@ -2,28 +2,13 @@ import React from "react";
 import Form, {InputField, PasswordField, SubmitButton} from "../../components/Form/Form";
 
 class Login extends React.Component {
-  state = {
-    username: '',
-    password: '',
-    error: null,
-  }
-
   onSubmit = (data) => {
-    console.log(data);
-  };
-
-  onChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
+    this.props.loginUser(data.username, data.password);
   };
 
   render() {
     return (
-      // <form onSubmit={this.onSubmit}>
-      //   <input type="text" name="username" onChange={this.onChange} />
-      //   <input type="password" name="password" onChange={this.onChange} />
-      //   <button className={`Button Button--green`}>Zaloguj się</button>
-      // </form>
-      <Form formLabel="Logowanie">
+      <Form formLabel="Logowanie" onSubmit={this.onSubmit}>
         <InputField name="username" placeholder="Adres e-mail" />
         <PasswordField name="password" placeholder="Hasło" />
         <SubmitButton>Zaloguj się</SubmitButton>

@@ -1,7 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import {BrowserRouter as Router, Route, useLocation, Switch} from 'react-router-dom';
+import {BrowserRouter as Router, Route, useLocation, Switch, Redirect} from 'react-router-dom';
 import styles from './App.module.scss';
-import Axios from "axios";
+
+import {setAuthenticationToken, loadAuthenticationTokenFromLocalStorage, get_categories,
+        get_auth_token, get_user_data, disable_and_remove_auth_token} from "./api";
+
+import {Snackbar} from "@material-ui/core";
+import CloseIcon from '@material-ui/icons/Close';
+import Alert from '@material-ui/lab/Alert';
 
 // import pages
 import HomePage from "./pages/HomePage/HomePage";
@@ -15,6 +21,33 @@ import Category from "./pages/Category/Category";
 import Product from "./pages/Product/Product";
 import Login from "./pages/Login/Login";
 import LinkButton from "./components/LinkButton/LinkButton";
+import Search from "./components/Search/Search";
+import Button from "@material-ui/core/Button";
+
+
+const initialUser = {
+  isAuthenticated: false,
+  username: '',
+  email: '',
+  firstName: '',
+  lastName: '',
+  lastLogin: null
+};
+const initialSnackbars = {
+  loggedIn: {
+    state: false,
+    severity: 'success',
+    message: (props) => `Pomyślnie zalogowano jako ${props.username}`,
+    props: {user: {}}
+  },
+  loggedOut: {
+    state: false,
+    severity: 'success',
+    message: (props) => "Zostałeś pomyślnie wylogowany",
+    props: {}
+  }
+};
+
 
 function UsePageViews() {
   let location = useLocation();
@@ -24,151 +57,92 @@ function UsePageViews() {
     setCategorySidebar(false);
   },[location]);
 
-  const [categories] = useState([
-    {
-      id: 0,
-      name: 'Kategoria A',
-      slug: 'kategoria-a',
-      amountOfPages: 5,
-      products: [
-        {
-          id: 0,
-          name: 'Lorem Ipsum',
-          slug: 'lorem-ipsum',
-          description: 'Lorem ipsum dolor sit amet.',
-          price: 19.99
-        },
-        {
-          id: 1,
-          name: 'Dolor sit',
-          slug: 'dolor-sit',
-          description: 'Lorem ipsum dolor sit amet.',
-          price: 39.99
-        }
-      ]
-    },
-    {
-      id: 1,
-      name: 'Kategoria B',
-      slug: 'kategoria-b',
-      amountOfPages: 11,
-      products: [
-        [
-          {
-            id: 0,
-            name: 'Lorem Ipsum',
-            slug: 'lorem-ipsum',
-            description: 'Lorem ipsum dolor sit amet.',
-            price: 19.99
-          },
-          {
-            id: 1,
-            name: 'Dolor sit',
-            slug: 'dolor-sit',
-            description: 'Lorem ipsum dolor sit amet.',
-            price: 39.99
+  useEffect(() => {
+    get_categories()
+      .then(({data}) => {
+        setCategories(data)
+      });
+  }, []);
+
+  useEffect(() => {
+    if (loadAuthenticationTokenFromLocalStorage()) {
+      get_user_data()
+        .then((resp) => {
+          if (resp.status === 200) {
+            setUser({...resp.data, isAuthenticated: true})
           }
-        ],
-        [
-          {
-            id: 43,
-            name: 'Lorem Ipsum 22',
-            slug: 'lorem-ipsum',
-            description: 'Lorem ipsum dolor sit amet.',
-            price: 49.99
-          },
-          {
-            id: 54,
-            name: 'Dolor sit 23',
-            slug: 'dolor-sit',
-            description: 'Lorem ipsum dolor sit amet.',
-            price: 59.99
-          }
-        ],
-      ]
+        });
     }
-  ]);
+  }, []);
+
+
+  const [categories, setCategories] = useState([]);
   const [categorySidebar, setCategorySidebar] = useState(false);
   const [profileSidebar, setProfileSidebar] = useState(false);
-  const [cart, setCart] = useState({
-    products: []
-  });
-  const [user] = useState({
-    isAuthenticated: false,
-    username: '',
-    email: '',
-    firstName: '',
-    lastName: '',
-    lastLogin: null
-  });
+  const [searchModal, setSearchModal] = useState(false);
+  const [cart, setCart] = useState({products: []});
+  const [user, setUser] = useState(initialUser);
+  const [snackbars, setSnackbars] = useState(initialSnackbars);
 
-  // const fetchUserCredentials = () => {
-  //   Axios({
-  //     method: 'GET',
-  //     url: 'http://127.0.0.1:8000/api/user/'
-  //   })
-  //     .then(({data}) => {
-  //       if (data.isAuthenticated) {
-  //         setUser(data);
-  //       } else {
-  //         setUser({
-  //           user: {
-  //             isAuthenticated: false,
-  //             username: '',
-  //             email: '',
-  //             firstName: '',
-  //             lastName: '',
-  //             lastLogin: null
-  //           }
-  //         })
-  //       }
-  //     })
-  // }
+
+  const showSnackbar = (name, props, severity='success') => {
+    setSnackbars({
+      ...snackbars,
+      [name]: {
+        ...snackbars[name],
+        state: true,
+        severity: severity,
+        props: {...snackbars[name].props, ...props}
+      }
+    });
+  };
+
+  const closeSnackbar = (name) => setSnackbars({...snackbars, [name]: {...snackbars[name], state: false}});
 
   const loginUser = (username, password) => {
-    Axios({
-      method: 'POST',
-      url: 'http://127.0.0.1:8000/api/authenticate/',
-      data: {
-        username: username,
-        password: password
-      },
-    })
-      .then(({data}) => {
-        if (this.unmounted) return;
-        if (data.isAuthenticated) {
-          this.setState({
-            user: data
-          })
-        } else {
-          this.setState({
-            user: {
-              isAuthenticated: false,
-              username: '',
-              email: '',
-              firstName: '',
-              lastName: '',
-              lastLogin: null
+    get_auth_token(username, password)
+      .then(resp => {
+        if (resp.status) {
+          window.localStorage.setItem('authToken', resp.data.auth_token);
+          setAuthenticationToken(resp.data.auth_token);
+        }
+
+        get_user_data()
+          .then((resp) => {
+            if (resp.status === 200) {
+              setUser({...resp.data, isAuthenticated: true})
+              showSnackbar('loggedIn', {username: resp.data.username});
             }
           })
-        }
       })
-  }
+  };
+
+  const logoutUser = () => {
+    if (user.isAuthenticated) {
+      disable_and_remove_auth_token()
+        .then((resp) => {
+          setAuthenticationToken(false);
+          setUser({
+            isAuthenticated: false
+          })
+          showSnackbar('loggedOut');
+        })
+    }
+  };
 
   const addProductToCart = (product) => {
     !inCart(product) && setCart({...cart, products: [...cart.products, product]})
-  }
+  };
 
   const deleteProductFromCart = (product) => {
     inCart(product) && setCart({...cart, products: cart.products.filter((item) => item.id !== product.id)})
-  }
+  };
 
   const inCart = (product) => !!cart.products.find((item) => item.id === product.id);
-
   const getCategoryBySlug = (slug) => categories.find((category) => category.slug === slug);
-
   const openProfileSidebar = () => setProfileSidebar(true);
   const closeProfileSidebar = () => setProfileSidebar(false);
+
 
   return (
     <>
@@ -177,15 +151,16 @@ function UsePageViews() {
           categories={categories}
           toggleCategories={() => setCategorySidebar(!categorySidebar)}
           openSidebar={openProfileSidebar}
-          user={user}
+          setSearchModal={setSearchModal}
         />
+        <Search setSearchModal={setSearchModal} show={searchModal} />
         <Sidebar show={categorySidebar}
                  side="left"
                  close={() => setCategorySidebar(false)}
                  title="Kategorie">
           {
-            categories.map(category => (
-              <LinkButton to={`/category/${category.slug}/1`} color="white" key={category.id}>{category.name}</LinkButton>
+            categories.map((category, index) => (
+              <LinkButton to={`/category/${category.slug}/1`} color="white" key={index}>{category.name}</LinkButton>
             ))
           }
         </Sidebar>
@@ -193,9 +168,40 @@ function UsePageViews() {
                  side="right"
                  close={closeProfileSidebar}
                  title="Twoje konto">
-          <LinkButton onClick={closeProfileSidebar} to="/register" color="green">Rejestracja</LinkButton>
-          <LinkButton onClick={closeProfileSidebar} to="/login" color="green">Logowanie</LinkButton>
+          {
+            user.isAuthenticated ? (
+              <>
+              <span>Zalogowano jako {user.username}</span>
+                <LinkButton onClick={() => {closeProfileSidebar(); logoutUser();}} color="green">Wyloguj się</LinkButton>
+              </>
+            ) : (
+              <>
+                <LinkButton to="/register" color="green">Rejestracja</LinkButton>
+                <LinkButton to="/login" color="green">Logowanie</LinkButton>
+              </>
+            )
+          }
         </Sidebar>
+        {
+          Object.keys(snackbars).map((key, index) => {
+            const snackbar = snackbars[key];
+            return (
+              <Snackbar anchorOrigin={{
+                          vertical: 'bottom',
+                          horizontal: 'left',
+                        }}
+                        key={index}
+                        open={snackbars[key].state}
+                        autoHideDuration={6000}
+                        onClose={() => closeSnackbar(key)}
+                        action={
+                          <Button onClick={() => closeSnackbar(key)}>
+                            <CloseIcon fontSize="small" />
+                          </Button>
+                        }><Alert severity={snackbar.severity}>{snackbar.message(snackbar.props)}</Alert></Snackbar>
+            )
+          })
+        }
       </div>
       <Switch>
         <Route exact path="/" component={() => <HomePage addProductToCart={addProductToCart}
@@ -215,11 +221,12 @@ function UsePageViews() {
         <Route exact path="/product/:slug"
                component={({match}) => <Product match={match}
                                                 inCart={inCart}
-                                                addProductToCart={addProductToCart} />
+                                                addProductToCart={addProductToCart}
+                                                location={location} />
                } />
-        <Route exact path="/login"
-               component={() => <Login loginUser={loginUser} />
-               } />
+        <Route exact path="/login">
+          { user.isAuthenticated ? <Redirect to="/" /> : <Login loginUser={loginUser} />}
+        </Route>
         <Route exact path="/register"
                component={() => <Register />
                } />
@@ -237,241 +244,5 @@ function App() {
     </>
   )
 }
-
-// class App extends React.Component{
-//   state = {
-//     showCategories: false,
-//     profileSidebar: true,
-//     categories: [
-//       {
-//         id: 0,
-//         name: 'Kategoria A',
-//         slug: 'kategoria-a',
-//         amountOfPages: 5,
-//         products: [
-//           {
-//             id: 0,
-//             name: 'Lorem Ipsum',
-//             slug: 'lorem-ipsum',
-//             description: 'Lorem ipsum dolor sit amet.',
-//             price: 19.99
-//           },
-//           {
-//             id: 1,
-//             name: 'Dolor sit',
-//             slug: 'dolor-sit',
-//             description: 'Lorem ipsum dolor sit amet.',
-//             price: 39.99
-//           }
-//         ]
-//       },
-//       {
-//         id: 1,
-//         name: 'Kategoria B',
-//         slug: 'kategoria-b',
-//         amountOfPages: 11,
-//         products: [
-//           [
-//             {
-//               id: 0,
-//               name: 'Lorem Ipsum',
-//               slug: 'lorem-ipsum',
-//               description: 'Lorem ipsum dolor sit amet.',
-//               price: 19.99
-//             },
-//             {
-//               id: 1,
-//               name: 'Dolor sit',
-//               slug: 'dolor-sit',
-//               description: 'Lorem ipsum dolor sit amet.',
-//               price: 39.99
-//             }
-//           ],
-//           [
-//             {
-//               id: 43,
-//               name: 'Lorem Ipsum 22',
-//               slug: 'lorem-ipsum',
-//               description: 'Lorem ipsum dolor sit amet.',
-//               price: 49.99
-//             },
-//             {
-//               id: 54,
-//               name: 'Dolor sit 23',
-//               slug: 'dolor-sit',
-//               description: 'Lorem ipsum dolor sit amet.',
-//               price: 59.99
-//             }
-//           ],
-//         ]
-//       }
-//     ],
-//     newProducts: [
-//       {
-//         id: 0,
-//         name: 'Lorem Ipsum',
-//         slug: 'lorem-ipsum',
-//         description: 'Lorem ipsum dolor sit amet.',
-//         price: 19.99
-//       },
-//       {
-//         id: 1,
-//         name: 'Dolor sit',
-//         slug: 'dolor-sit',
-//         description: 'Lorem ipsum dolor sit amet.',
-//         price: 39.99
-//       }
-//     ],
-//     cart: {
-//       products: []
-//     },
-//     user: {
-//       isAuthenticated: false,
-//       username: '',
-//       email: '',
-//       firstName: '',
-//       lastName: '',
-//       lastLogin: null
-//     },
-//   }
-//
-//
-//   fetchUserCredentials = () => {
-//     Axios({
-//       method: 'GET',
-//       url: 'http://127.0.0.1:8000/api/user/'
-//     })
-//       .then(({data}) => {
-//         if (this.unmounted) return;
-//         if (data.isAuthenticated) {
-//           this.setState({
-//             user: data
-//           })
-//         } else {
-//             this.setState({
-//               user: {
-//                 isAuthenticated: false,
-//                 username: '',
-//                 email: '',
-//                 firstName: '',
-//                 lastName: '',
-//                 lastLogin: null
-//               }
-//             })
-//         }
-//       })
-//   }
-//
-//   loginUser = (username, password) => {
-//     Axios({
-//       method: 'POST',
-//       url: 'http://127.0.0.1:8000/api/authenticate/',
-//       data: {
-//         username: username,
-//         password: password
-//       },
-//     })
-//       .then(({data}) => {
-//         if (this.unmounted) return;
-//         if (data.isAuthenticated) {
-//           this.setState({
-//             user: data
-//           })
-//         } else {
-//           this.setState({
-//             user: {
-//               isAuthenticated: false,
-//               username: '',
-//               email: '',
-//               firstName: '',
-//               lastName: '',
-//               lastLogin: null
-//             }
-//           })
-//         }
-//       })
-//   }
-//
-//   addProductToCart = (product) => {
-//     !this.inCart(product) && this.setState((prevState) => ({
-//       cart: {...prevState.cart, products: [...prevState.cart.products, product]}
-//     }));
-//   }
-//
-//   deleteProductFromCart = (product) => {
-//     this.inCart(product) && this.setState((prevState) => ({
-//       cart: {...prevState.cart, products: prevState.cart.products.filter((item) => item.id !== product.id)}
-//     }))
-//   }
-//
-//   toggleCategories = (e, newState) => {
-//     this.setState((prevState) => ({showCategories: newState !== undefined ? newState : !prevState.showCategories}));
-//   }
-//
-//   componentWillUnmount() {
-//     this.unmounted = true;
-//   }
-//
-//   componentDidMount() {
-//     this.fetchUserCredentials();
-//   }
-//
-//   inCart = (product) => !!this.state.cart.products.find((item) => item.id === product.id);
-//
-//   getCategoryBySlug = (slug) => this.state.categories.find((category) => category.slug === slug);
-//
-//   openProfileSidebar = () => this.setState({profileSidebar: true});
-//   closeProfileSidebar = () => this.setState({profileSidebar: false});
-//
-//   render() {
-//     return (
-//       <>
-//         <Router>
-//           <div className={styles.App}>
-//             <NavBar
-//               categories={this.state.categories}
-//               showCategories={this.state.showCategories}
-//               toggleCategories={this.toggleCategories}
-//               openSidebar={this.openProfileSidebar}
-//               user={this.state.user}
-//             />
-//             <Sidebar show={this.state.profileSidebar}
-//                      close={this.closeProfileSidebar}
-//                      title="Twoje konto">
-//               <LinkButton onClick={this.closeProfileSidebar} to="/register" color="green">Rejestracja</LinkButton>
-//               <LinkButton onClick={this.closeProfileSidebar} to="/login" color="green">Logowanie</LinkButton>
-//             </Sidebar>
-//             <Route exact path="/" component={() => <HomePage newProducts={this.state.newProducts}
-//                                                              addProductToCart={this.addProductToCart}
-//                                                              inCart={this.inCart} />
-//             }/>
-//             <Route path="/cart" component={() => <Cart cart={this.state.cart}
-//                                                        addProductToCart={this.addProductToCart}
-//                                                        deleteProductFromCart={this.deleteProductFromCart}
-//                                                        inCart={this.inCart} />}
-//             />
-//             <Route exact path="/category/:slug/:page"
-//                    component={({match}) => <Category match={match}
-//                                                      getCategoryBySlug={this.getCategoryBySlug}
-//                                                      inCart={this.inCart}
-//                                                      addProductToCart={this.addProductToCart} />
-//             }/>
-//             <Route exact path="/product/:slug"
-//                    component={({match}) => <Product match={match}
-//                                                     inCart={this.inCart}
-//                                                     addProductToCart={this.addProductToCart} />
-//             } />
-//             <Route exact path="/login"
-//                    component={() => <Login loginUser={this.loginUser} />
-//             } />
-//             <Route exact path="/register"
-//                    component={() => <Register />
-//             } />
-//           </div>
-//         </Router>
-//       </>
-//     )
-//   }
-// }
 
 export default App;
